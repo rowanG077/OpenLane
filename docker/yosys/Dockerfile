@@ -22,7 +22,10 @@ ARG YOSYS_REPO
 ARG YOSYS_COMMIT
 
 WORKDIR /yosys
-RUN curl -L ${YOSYS_REPO}/tarball/${YOSYS_COMMIT} | tar -xzC . --strip-components=1 && \
+RUN git clone ${YOSYS_REPO} /yosys &&\
+    git checkout ${YOSYS_COMMIT} &&\
+    sed -i -e 's|abc/abc$(EXE) abc/libabc.a: check-git-abc|abc/abc$(EXE) abc/libabc.a:|' Makefile &&\
+    git submodule update --init &&\
     make PREFIX=/build config-gcc &&\
     make PREFIX=/build -j$(nproc) &&\
     make PREFIX=/build install
